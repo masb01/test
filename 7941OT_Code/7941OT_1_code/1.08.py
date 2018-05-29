@@ -3,7 +3,7 @@ Code illustration: 1.08
 A demonstration of grid() geometry manager options
 @Tkinter GUI Application Development Hotshot
 """ 
-from Tkinter import *
+from tkinter import *
 parent = Tk()
 parent.title('Find & Replace')
 
