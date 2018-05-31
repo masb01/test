@@ -7,6 +7,8 @@ en este hay que tener habilitado el X11 forwarding....
 
 sudo  apt-get install x-window-system
 sudo apt-get install python3-matplotlib
+sudo apt install python3-mysqldb
+
 
 ssh -X -p 2254 miguelsb@vps359886.ovh.net
 

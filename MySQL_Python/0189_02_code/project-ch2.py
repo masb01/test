@@ -23,7 +23,7 @@ opt.add_option("-o", "--output", action="store", type="string", dest="outfile")
 opt, args = opt.parse_args()
 
 
-mydb = MySQLdb.connect(host = 'localhost', user = 'root', passwd = 'r00tp4ss', db = 'world')
+mydb = MySQLdb.connect(host = 'localhost', user = 'root', passwd = '5494983', db = 'infosec')
 cur = mydb.cursor()
 column = 'Name'
 term = opt.term
@@ -65,6 +65,7 @@ if opt.outfile:
 	out.write(output)
 
 else:	
-	print output
+	print(output)
+
         
 
