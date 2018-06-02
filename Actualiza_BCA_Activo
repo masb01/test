@@ -1,0 +1,83 @@
+REM  *****  BASIC  *****
+
+Sub Main
+
+End Sub
+
+Sub Actualiza_BCA_Activo
+
+REM *** Esta rutina se ejecutará siempre que se cree o actualice un activo
+REM *** Por tanto, será referenciada desde el formulario de activos
+REM *** Primero nos ocupamos de tener una conexión a la base de datos
+
+	oDataSource = ThisComponent.Parent.CurrentController
+	If NOT (oDataSource.isConnected()) Then
+		oDataSource.connect()	
+	End If
+	oConnection = oDataSource.ActiveConnection()
+	oSQL_Statement = oConnection.createStatement()
+	oSQL_Statement_00 = oConnection.createStatement()
+	oSQL_Statement_01 = oConnection.createStatement()
+	oSQL_Statement_02 = oConnection.createStatement()
+	
+	stSql = "SELECT * FROM activos"
+	oQuery_result = oSQL_Statement.executeQuery(stSql)
+	If NOT ISNULL(oQuery_result) Then
+		WHILE oQuery_result.next
+		    REM *** Almacenamos el Código del Activo en el cursor y otras variables relevantes
+			codActivo = oQuery_result.getInt(1)
+			tipoActivo = oQuery_result.getInt(2)
+			codCriticidad = oQuery_result.getInt(5)					
+			REM *** Abrimos un nuevo cursor para ver si sobre el activo en curso ya
+			REM *** se había creado el BCA o no
+			stSql_01 = "SELECT COUNT(*) FROM rel_activo_baseline WHERE idactivo = " + codActivo
+			oQuery_result_01 = oSQL_Statement_01.executeQuery(stSql_01)
+			oQuery_result_01.next
+			num_of_rows = oQuery_result_01.getINT(1)
+			If num_of_rows > 0 Then REM *** Existe el BCA para el activo, entonces sólo se actualiza
+				stSql_00 = "SELECT capitulo, articulo, seccion, sub_seccion, apicabilidad_criticidad FROM baseline_standard" 
+				oQuery_result_00 = oSQL_Statement_00.executeQuery(stSql_00)
+				IF NOT ISNULL(oQuery_result_00)	Then
+					WHILE oQuery_result_00.next
+					    fc = oQuery_result_00.getInt(1)
+					    fa = oQuery_result_00.getInt(2) 
+					    fs = oQuery_result_00.getInt(3)
+					    fb = oQuery_result_00.getInt(4)
+					    fd = CStr(fc) + CStr(fa) + CStr(fs) + CStr(fb) 
+					    cc = oQuery_result_00.getInt(5)
+					    If codCriticidad <> cc Then
+					    	ap = 0
+					    Else
+					    	ap = 1
+					    End If				
+						REM ***stSql_02 = "UPDATE rel_activo_baseline SET idactivo = " + codActivo + ", capitulo = " + fc + ", articulo = " + fa + ", seccion = " + fs + ", sub_seccion = " + fb + ", codigo = '" + fd + "', aplicable = " + ap  
+						stSql_02 = "UPDATE rel_activo_baseline SET aplicable = " + ap + " WHERE idactivo = " + codActivo + " AND capitulo = " + fc +  " AND articulo = " + fa + " AND seccion = " + fs + " AND sub_seccion = " + fb   
+						oQuery_result_02 = oSQL_Statement_02.execute(stSql_02)					
+					WEND
+				End IF				
+			Else REM *** En este caso, hay que crear el BCA
+				stSql_00 = "SELECT capitulo, articulo, seccion, sub_seccion, apicabilidad_criticidad FROM baseline_standard"
+				oQuery_result_00 = oSQL_Statement_00.executeQuery(stSql_00)
+				IF NOT ISNULL(oQuery_result_00)	Then
+					WHILE oQuery_result_00.next
+					    fc = oQuery_result_00.getInt(1)
+					    fa = oQuery_result_00.getInt(2) 
+					    fs = oQuery_result_00.getInt(3)
+					    fb = oQuery_result_00.getInt(4)
+					    fd = CStr(fc) + CStr(fa) + CStr(fs) + CStr(fb) 
+					    cc = oQuery_result_00.getInt(5)
+					    If codCriticidad <> cc Then
+					    	ap = 0
+					    Else
+					    	ap = 1
+					    End If					
+						stSql_02 = "INSERT INTO rel_activo_baseline (idactivo, capitulo, articulo, seccion, sub_seccion, codigo, aplicable) VALUES (" + codActivo + ", " + fc + ", " + fa + ", " + fs + ", '" + fb + "', " + fd + ", " + ap + ")"
+						oQuery_result_02 = oSQL_Statement_02.execute(stSql_02)					
+					WEND
+				End IF						
+			End If 
+			REM **** msgbox (codActivo) 
+		WEND
+	End If
+
+End Sub
