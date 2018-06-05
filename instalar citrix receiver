@@ -1,0 +1,13 @@
+1. Descarga el .deb de la página de Citrix.
+
+https://www.citrix.es/downloads/citrix-receiver/linux/receiver-for-linux-latest.html
+
+2.Copiar los certificados de Mozilla a Citrix
+
+
+sudo ln -s /usr/share/ca-certificates/mozilla/* /opt/Citrix/ICAClient/keystore/cacerts/
+sudo c_rehash /opt/Citrix/ICAClient/keystore/cacerts/
+
+3. Accede a Freeway de Ing Direct
+
+https://freeway.ingdirect.es
